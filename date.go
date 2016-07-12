@@ -1,6 +1,8 @@
 package date
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"strconv"
 	"time"
 )
@@ -8,10 +10,7 @@ import (
 // Date represents a SQL date column with no time or timezone information.
 type Date time.Time
 
-func (d *Date) Time() time.Time {
-	return time.Time(*d)
-}
-
+// NewDate constructs a new Date object for the given year, month and day
 func NewDate(y, m, d int) Date {
 	return Date(time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.UTC))
 }
@@ -36,6 +35,29 @@ func (d *Date) MarshalJSON() ([]byte, error) {
 	return []byte(ds), nil
 }
 
+// Implement Stringer
+
+// String returns the value of the Date in ISO-8601 format.
 func (d *Date) String() string {
-	return d.Time().Format("2006-01-02")
+	return time.Time(*d).Format("2006-01-02")
+}
+
+// Implement Valuer
+
+func (d Date) Value() (driver.Value, error) {
+	return time.Time(d), nil
+}
+
+// Implement Scanner
+
+func (d *Date) Scan(value interface{}) error {
+	if value == nil {
+		return fmt.Errorf("unsupported NULL date.Date value")
+	}
+	t, ok := value.(time.Time)
+	if ok {
+		*d = Date(t)
+		return nil
+	}
+	return fmt.Errorf("unable to convert Date")
 }
