@@ -41,3 +41,40 @@ func TestDate(t *testing.T) {
 		}
 	}
 }
+
+func TestTimeIgnored(t *testing.T) {
+	d1 := FromTime(time.Date(2016, 10, 4, 1, 0, 0, 0, time.UTC))
+	d2 := FromTime(time.Date(2016, 10, 4, 21, 0, 0, 0, time.UTC))
+	if d2.After(d1) {
+		t.Errorf("%s after %s (when created from times with hour difference)", d2, d1)
+	}
+	if !d2.Equal(d1) {
+		t.Errorf("%s not equal to %s (when created from times with hour difference)", d2, d1)
+	}
+	if d2.Before(d1) {
+		t.Errorf("%s before %s (when created from times with hour difference)", d2, d1)
+	}
+}
+
+func TestComparisons(t *testing.T) {
+	d1 := NewDate(2016, 10, 15)
+	d2 := NewDate(2016, 10, 16)
+	if !d1.Before(d2) {
+		t.Errorf("%s before %s returned false, expected true", d1, d2)
+	}
+	if d1.Equal(d2) {
+		t.Errorf("%s equal %s returned true, expected false", d1, d2)
+	}
+	if d1.After(d2) {
+		t.Errorf("%s after %s returned true, expected false", d1, d2)
+	}
+}
+
+func TestAdd(t *testing.T) {
+	d1 := NewDate(2016, 2, 28)
+	d2 := d1.AddDate(0, 0, 2)
+	d3 := NewDate(2016, 3, 1)
+	if !d2.Equal(d3) {
+		t.Errorf("%s +2 days returned %s, expected %s", d1, d2, d3)
+	}
+}
