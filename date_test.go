@@ -68,6 +68,12 @@ func TestComparisons(t *testing.T) {
 	if d1.After(d2) {
 		t.Errorf("%s after %s returned true, expected false", d1, d2)
 	}
+	if d1.After(d1) {
+		t.Errorf("%s after itself returned true, expected false", d1)
+	}
+	if d1.Before(d1) {
+		t.Errorf("%s before itself returned true, expected false", d1)
+	}
 }
 
 func TestAdd(t *testing.T) {
